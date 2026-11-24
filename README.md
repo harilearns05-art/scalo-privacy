@@ -1,6 +1,6 @@
-# Scalo Privacy Policy
+# Scale Game Privacy Policy
 
-App: Scalo (com.scalo.app). Developer: Scalo Games. Contact: harilearns05@gmail.com. Last updated: 25 November 2026.
+App: Scale Game (com.scalo.app). Developer: Scalo Games. Contact: harilearns05@gmail.com. Last updated: 25 November 2026.
 
 ## What the app stores on your phone
 Progress (stars, streak, badges, collection, friends list names, settings, your display name). This stays on your device and is removed when you uninstall.
@@ -18,7 +18,7 @@ This version of the app has no ads. If ads are added in a future update, this po
 Accelerometer (tilt the ball; the data is not sent anywhere), vibration, and internet (for online races).
 
 ## Children
-Scalo is not directed to children under 13. We do not knowingly collect personal information from children under 13. If you believe a child under 13 has used the app, contact us and we will delete the related online data.
+Scale Game is not directed to children under 13. We do not knowingly collect personal information from children under 13. If you believe a child under 13 has used the app, contact us and we will delete the related online data.
 
 ## Your choices
 Delete local data: Settings > Reset all progress, or uninstall the app. To ask for deletion of your online data, email harilearns05@gmail.com with your display name.
