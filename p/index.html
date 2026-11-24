@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Open in Scalo</title>
+<style>
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0b1630;color:#fff;font-family:system-ui,sans-serif;text-align:center;padding:24px}
+h1{font-size:34px;margin:0 0 6px}p{color:#9aa6d4;margin:6px 0 22px}
+a.b{display:block;background:#ffc83d;color:#0b1630;font-weight:700;font-size:20px;padding:16px 34px;border-radius:30px;text-decoration:none;margin:8px}
+a.s{background:#16264f;color:#fff}
+small{color:#6f7ba8;margin-top:18px;max-width:320px}
+</style></head><body>
+<h1>Scalo</h1>
+<p id="msg">A friend sent you a challenge!</p>
+<a class="b" id="open" href="#">Open in Scalo</a>
+<a class="b s" id="store" href="https://play.google.com/store/apps/details?id=com.scalo.app">Get Scalo on Google Play</a>
+<small id="note"></small>
+<script>
+var q=location.search||"";
+var store="https://play.google.com/store/apps/details?id=com.scalo.app";
+var intent="intent://open"+q+"#Intent;scheme=scalo;package=com.scalo.app;S.browser_fallback_url="+encodeURIComponent(store)+";end";
+var isAndroid=/Android/i.test(navigator.userAgent);
+var open=document.getElementById("open");
+if(isAndroid){open.href=intent;setTimeout(function(){location.href=intent;},400);}
+else{open.style.display="none";document.getElementById("note").textContent="Scalo is an Android game. Open this link on your Android phone.";}
+var p=new URLSearchParams(q);
+if(p.get("ws"))document.getElementById("msg").textContent="A friend made a word search for you!";
+else if(p.get("room"))document.getElementById("msg").textContent="A friend invited you to a race!";
+else if(p.get("grp"))document.getElementById("msg").textContent="A friend invited you to their group!";
+else if(p.get("party"))document.getElementById("msg").textContent="A friend invited you to a party race!";
+</script></body></html>
