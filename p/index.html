@@ -26,5 +26,6 @@ var p=new URLSearchParams(q);
 if(p.get("ws"))document.getElementById("msg").textContent="A friend made a word search for you!";
 else if(p.get("room"))document.getElementById("msg").textContent="A friend invited you to a race!";
 else if(p.get("grp"))document.getElementById("msg").textContent="A friend invited you to their group!";
+else if(p.get("vault"))document.getElementById("msg").textContent="A friend locked a secret in a vault for you!";
 else if(p.get("party"))document.getElementById("msg").textContent="A friend invited you to a party race!";
 </script></body></html>
