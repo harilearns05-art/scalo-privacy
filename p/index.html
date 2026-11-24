@@ -1,31 +1,177 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Open in Scalo</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Scalo</title>
 <style>
-body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0b1630;color:#fff;font-family:system-ui,sans-serif;text-align:center;padding:24px}
-h1{font-size:34px;margin:0 0 6px}p{color:#9aa6d4;margin:6px 0 22px}
-a.b{display:block;background:#ffc83d;color:#0b1630;font-weight:700;font-size:20px;padding:16px 34px;border-radius:30px;text-decoration:none;margin:8px}
-a.s{background:#16264f;color:#fff}
-small{color:#6f7ba8;margin-top:18px;max-width:320px}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#0b1630;color:#fff;font-family:system-ui,sans-serif;text-align:center;padding:18px 12px 40px}
+h1{font-size:30px;margin:4px 0}h2{font-size:20px;margin:6px 0}p{color:#9aa6d4;margin:6px 0 14px}
+a.b,button.b{display:block;width:100%;max-width:340px;margin:10px auto;background:#ffc83d;color:#0b1630;font-weight:700;font-size:18px;padding:14px;border:0;border-radius:28px;text-decoration:none;cursor:pointer}
+a.s,button.s{background:#16264f;color:#fff}
+canvas{touch-action:none;background:#101d3d;border-radius:14px;display:block;margin:10px auto}
+#words{line-height:2;font-size:15px}#words span{margin:0 6px}#words .f{text-decoration:line-through;color:#6f7ba8}
+input{width:100%;max-width:340px;padding:12px;font-size:18px;border-radius:12px;border:0;text-align:center}
+.box{max-width:420px;margin:0 auto}.lock{font-size:64px}.dots span{display:inline-block;width:14px;height:14px;border-radius:50%;background:#e5484d;margin:4px}.dots .on{background:#3dd88c}
+#secret{background:#16264f;border-radius:16px;padding:18px;font-size:20px;white-space:pre-wrap;margin:12px 0}
+.hide{display:none}
 </style></head><body>
+<div class="box">
 <h1>Scalo</h1>
-<p id="msg">A friend sent you a challenge!</p>
-<a class="b" id="open" href="#">Open in Scalo</a>
-<a class="b s" id="store" href="https://play.google.com/store/apps/details?id=com.scalo.app">Get Scalo on Google Play</a>
-<small id="note"></small>
+<div id="app"></div>
+<div id="cta">
+<a class="b s" id="open" href="#">Open in Scalo app</a>
+<a class="b s" href="https://play.google.com/store/apps/details?id=com.scalo.app">Get Scalo on Google Play</a>
+</div>
+</div>
 <script>
-var q=location.search||"";
+var q=new URLSearchParams(location.search);
+var $=function(i){return document.getElementById(i)};
 var store="https://play.google.com/store/apps/details?id=com.scalo.app";
-var intent="intent://open"+q+"#Intent;scheme=scalo;package=com.scalo.app;S.browser_fallback_url="+encodeURIComponent(store)+";end";
+var intent="intent://open"+(location.search||"")+"#Intent;scheme=scalo;package=com.scalo.app;S.browser_fallback_url="+encodeURIComponent(store)+";end";
 var isAndroid=/Android/i.test(navigator.userAgent);
-var open=document.getElementById("open");
-if(isAndroid){open.href=intent;setTimeout(function(){location.href=intent;},400);}
-else{open.style.display="none";document.getElementById("note").textContent="Scalo is an Android game. Open this link on your Android phone.";}
-var p=new URLSearchParams(q);
-if(p.get("ws"))document.getElementById("msg").textContent="A friend made a word search for you!";
-else if(p.get("room"))document.getElementById("msg").textContent="A friend invited you to a race!";
-else if(p.get("grp"))document.getElementById("msg").textContent="A friend invited you to their group!";
-else if(p.get("vault"))document.getElementById("msg").textContent="A friend locked a secret in a vault for you!";
-else if(p.get("party"))document.getElementById("msg").textContent="A friend invited you to a party race!";
+var app=$("app");
+if(isAndroid)$("open").href=intent;else $("open").style.display="none";
+
+function htm(s){app.innerHTML=s}
+
+// ------------------------------------------------ word search
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+var D=[[0,1],[1,0],[1,1],[-1,1],[0,-1],[-1,0],[-1,-1],[1,-1]];
+function gen(words,seed){
+  var r=rng(seed),w=words.slice().sort(function(a,b){return b.length-a.length});
+  var tot=w.reduce(function(s,x){return s+x.length},0);
+  var base=Math.max(7,w[0].length,Math.ceil(Math.sqrt(tot*2.4)));
+  for(var at=0;at<80;at++){
+    var n=Math.min(18,base+Math.floor(at/10)),g=[],ok=true,i,j;
+    for(i=0;i<n;i++){g.push([]);for(j=0;j<n;j++)g[i].push("")}
+    for(var k=0;k<w.length&&ok;k++){
+      var x=w[k],placed=false;
+      for(var t=0;t<250&&!placed;t++){
+        var d=D[Math.floor(r()*8)],a=Math.floor(r()*n),b=Math.floor(r()*n);
+        var ea=a+d[0]*(x.length-1),eb=b+d[1]*(x.length-1);
+        if(ea<0||ea>=n||eb<0||eb>=n)continue;
+        var fit=true;
+        for(i=0;i<x.length;i++){var c=g[a+d[0]*i][b+d[1]*i];if(c&&c!==x[i]){fit=false;break}}
+        if(!fit)continue;
+        for(i=0;i<x.length;i++)g[a+d[0]*i][b+d[1]*i]=x[i];
+        placed=true;
+      }
+      if(!placed)ok=false;
+    }
+    if(ok){for(i=0;i<n;i++)for(j=0;j<n;j++)if(!g[i][j])g[i][j]=String.fromCharCode(65+Math.floor(r()*26));return{n:n,g:g,w:words}}
+  }
+  return gen(words,seed+1);
+}
+var COL=["#2EC4B6","#FF6B6B","#5AA9FF","#B388FF","#FFB84D","#7BD88F","#FF8FC8","#E0E060"];
+function startWS(spec){
+  var m=/^(\d+):([A-Za-z,]+)$/.exec(spec);
+  if(!m){htm("<p>That puzzle link looks broken.</p>");return}
+  var words=[];m[2].toUpperCase().split(",").forEach(function(x){if(x.length>=3&&x.length<=10&&words.indexOf(x)<0)words.push(x)});
+  if(words.length<3||words.length>12){htm("<p>That puzzle link looks broken.</p>");return}
+  var P=gen(words,Number(m[1])),found={},fl=[],t0=Date.now(),done=false;
+  htm("<h2>A friend made a word search for you!</h2><p>Drag across letters to find the words. No app needed.</p><canvas id=c></canvas><div id=words></div><div id=res></div>");
+  var cv=$("c"),size=Math.min(window.innerWidth-24,520),dpr=window.devicePixelRatio||1;
+  cv.style.width=size+"px";cv.style.height=size+"px";cv.width=size*dpr;cv.height=size*dpr;
+  var ctx=cv.getContext("2d");ctx.scale(dpr,dpr);
+  var cell=size/P.n,sel=null,sr=0,sc=0,down=false;
+  function cap(l,col,al){
+    ctx.save();ctx.globalAlpha=al;ctx.fillStyle=col;
+    ctx.translate((l[1]+.5)*cell,(l[0]+.5)*cell);ctx.rotate(Math.atan2(l[2],l[3]));
+    var len=(l[4]-1)*cell*((l[2]&&l[3])?1.4142:1),rad=cell*.42;
+    ctx.beginPath();ctx.roundRect?ctx.roundRect(-rad,-rad,len+2*rad,2*rad,rad):ctx.rect(-rad,-rad,len+2*rad,2*rad);ctx.fill();ctx.restore();
+  }
+  function draw(){
+    ctx.clearRect(0,0,size,size);
+    fl.forEach(function(l){cap(l,COL[l[5]%8],.7)});
+    if(sel)cap(sel,"#ffffff",.4);
+    ctx.fillStyle="#fff";ctx.font="bold "+(cell*.52)+"px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";
+    for(var r=0;r<P.n;r++)for(var c=0;c<P.n;c++)ctx.fillText(P.g[r][c],(c+.5)*cell,(r+.5)*cell+1);
+  }
+  function wl(){$("words").innerHTML=words.map(function(w){return"<span class='"+(found[w]?"f":"")+"'>"+w+"</span>"}).join("")}
+  function pos(e){var b=cv.getBoundingClientRect();return[(e.clientX-b.left)/cell,(e.clientY-b.top)/cell]}
+  cv.onpointerdown=function(e){if(done)return;var p=pos(e);sc=Math.floor(p[0]);sr=Math.floor(p[1]);if(sr<0||sc<0||sr>=P.n||sc>=P.n)return;down=true;cv.setPointerCapture(e.pointerId);sel=[sr,sc,0,1,1,0];draw()};
+  cv.onpointermove=function(e){
+    if(!down)return;var p=pos(e),fx=p[0]-.5-sc,fy=p[1]-.5-sr;
+    if(fx*fx+fy*fy<.16){sel=[sr,sc,0,1,1,0]}
+    else{
+      var k=Math.round(Math.atan2(fy,fx)/(Math.PI/4)),dc=Math.round(Math.cos(k*Math.PI/4)),dr=Math.round(Math.sin(k*Math.PI/4));
+      var len=Math.max(1,Math.round((fx*dc+fy*dr)/(dc*dc+dr*dr))+1);
+      while(len>1&&(sr+dr*(len-1)<0||sr+dr*(len-1)>=P.n||sc+dc*(len-1)<0||sc+dc*(len-1)>=P.n))len--;
+      sel=[sr,sc,dr,dc,len,0];
+    }
+    draw();
+  };
+  cv.onpointerup=function(){
+    if(!down)return;down=false;
+    if(sel&&sel[4]>=2){
+      var s="";for(var i=0;i<sel[4];i++)s+=P.g[sel[0]+sel[2]*i][sel[1]+sel[3]*i];
+      var rv=s.split("").reverse().join(""),w=null;
+      for(var k=0;k<words.length;k++){if(!found[words[k]]&&(words[k]===s||words[k]===rv)){w=words[k];break}}
+      if(w){
+        found[w]=1;
+        fl.push(w===s?[sel[0],sel[1],sel[2],sel[3],sel[4],fl.length]:[sel[0]+sel[2]*(sel[4]-1),sel[1]+sel[3]*(sel[4]-1),-sel[2],-sel[3],sel[4],fl.length]);
+        if(navigator.vibrate)navigator.vibrate(30);
+        wl();
+        if(Object.keys(found).length===words.length)win();
+      }
+    }
+    sel=null;draw();
+  };
+  function win(){
+    done=true;var s=Math.round((Date.now()-t0)/1000),t=Math.floor(s/60)+":"+("0"+s%60).slice(-2);
+    var msg="I solved your word search in "+t+"! Now try Scalo: "+store;
+    $("res").innerHTML="<h2>Solved in "+t+"!</h2><button class='b' id=tell>Tell my friend my time</button><p>Want mazes, races and your own puzzles? Get the Scalo app.</p>";
+    $("tell").onclick=function(){if(navigator.share)navigator.share({text:msg}).catch(function(){});else if(navigator.clipboard){navigator.clipboard.writeText(msg);$("tell").textContent="Copied! Paste it to your friend"}};
+  }
+  wl();draw();
+}
+
+// ------------------------------------------------ vault
+var enc=new TextEncoder();
+function b64(s){s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";var b=atob(s),a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a}
+function norm(s){return(s.toLowerCase().match(/[\p{L}\p{N}]/gu)||[]).join("")}
+function sha(s){return crypto.subtle.digest("SHA-256",enc.encode(s)).then(function(d){return new Uint8Array(d)})}
+function hex(a){return Array.prototype.map.call(a,function(x){return("0"+x.toString(16)).slice(-2)}).join("")}
+function startVault(code){
+  var V;try{V=JSON.parse(new TextDecoder().decode(b64(code)));if(!V.l||!V.l.length||V.l.length>3)throw 0}catch(e){htm("<p>That vault link looks broken.</p>");return}
+  var ans=[],i=0;
+  htm("<h2>"+esc(V.t||"A secret vault")+"</h2><div class=lock id=lk>\uD83D\uDD12</div><div class=dots id=dots></div><div id=clue style='font-size:19px;margin:10px 0'></div><input id=a placeholder='Your answer' autocomplete=off><button class='b' id=go>Unlock</button><button class='b s' id=hint>Hint</button><div id=out></div>");
+  function dots(){$("dots").innerHTML=V.l.map(function(_,k){return"<span class='"+(k<i?"on":"")+"'></span>"}).join("")}
+  function show(){$("clue").textContent="Lock "+(i+1)+" of "+V.l.length+": "+V.l[i].c;$("a").value="";dots()}
+  $("hint").onclick=function(){alert(V.l[i].h?"Hint: "+V.l[i].h:"No hint for this one. Think harder!")};
+  $("go").onclick=function(){
+    var a=$("a").value;
+    sha("vault|"+norm(a)).then(function(h){
+      if(hex(h).slice(0,10)!==V.l[i].k){if(navigator.vibrate)navigator.vibrate(60);$("lk").textContent="\u274C";setTimeout(function(){$("lk").textContent="\uD83D\uDD12"},500);return}
+      ans.push(a);i++;
+      if(i<V.l.length){show();return}
+      dots();opened();
+    });
+  };
+  function opened(){
+    sha(ans.map(norm).join("|")).then(function(k){
+      var all=b64(V.m);
+      return crypto.subtle.importKey("raw",k.slice(0,16),"AES-GCM",false,["decrypt"]).then(function(key){
+        return crypto.subtle.decrypt({name:"AES-GCM",iv:all.slice(0,12),tagLength:128},key,all.slice(12))
+      });
+    }).then(function(pt){
+      $("lk").textContent="\uD83D\uDD13";$("go").style.display="none";$("hint").style.display="none";$("a").style.display="none";$("clue").textContent="";
+      $("out").innerHTML="<h2>Vault opened!</h2><div id=secret></div><p>Build your own vault and lock a secret for your friends in the Scalo app.</p>";
+      $("secret").textContent=new TextDecoder().decode(pt);
+    }).catch(function(){$("out").textContent="Could not open the vault. Ask your friend to resend it."});
+  }
+  show();
+}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+
+// ------------------------------------------------ router
+if(q.get("ws")){startWS(q.get("ws"))}
+else if(q.get("vault")){startVault(q.get("vault"))}
+else{
+  var msgs={room:"A friend invited you to a race!",grp:"A friend invited you to their group!",party:"A friend invited you to a party race!"},m="A friend sent you a challenge!";
+  for(var k in msgs)if(q.get(k))m=msgs[k];
+  htm("<p>"+m+"</p>");
+  if(isAndroid)setTimeout(function(){location.href=intent},400);
+  else{var n=document.createElement("p");n.textContent="Scalo is an Android game. Open this link on your Android phone.";app.appendChild(n)}
+}
 </script></body></html>
