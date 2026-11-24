@@ -13,8 +13,17 @@ canvas{touch-action:none;background:#101d3d;border-radius:14px;display:block;mar
 input{width:100%;max-width:340px;padding:12px;font-size:18px;border-radius:12px;border:0;text-align:center}
 .box{max-width:420px;margin:0 auto}.lock{font-size:64px}.dots span{display:inline-block;width:14px;height:14px;border-radius:50%;background:#e5484d;margin:4px}.dots .on{background:#3dd88c}
 #secret{background:#16264f;border-radius:16px;padding:18px;font-size:20px;white-space:pre-wrap;margin:12px 0}
+#pg{position:fixed;inset:0;background:#0b1630;z-index:9;display:flex;align-items:center;justify-content:center;flex-direction:column;overflow:hidden}
+#pg .bird{position:absolute;top:34%;left:0;font-size:72px;animation:fl 2.2s linear forwards;white-space:nowrap}
+#pg .bird small{display:block;font-size:44px;text-align:center;margin-top:-8px;animation:sw .5s ease-in-out infinite alternate}
+#pg .t{position:absolute;top:66%;color:#fff;font-size:20px;font-weight:700}
+@keyframes fl{from{transform:translateX(100vw) scaleX(-1)}to{transform:translateX(-30vw) scaleX(-1)}}
+@keyframes sw{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}
+.wing{display:inline-block;animation:fp .22s ease-in-out infinite alternate}
+@keyframes fp{from{transform:translateY(-6px)}to{transform:translateY(6px)}}
 .hide{display:none}
 </style></head><body>
+<div id="pg"><div class="bird"><span class="wing">&#x1F54A;&#xFE0F;</span><small>&#x2709;&#xFE0F;</small></div><div class="t">A pigeon brought you a message!</div></div>
 <div class="box">
 <h1>Scalo</h1>
 <div id="app"></div>
@@ -164,6 +173,7 @@ function startVault(code){
 }
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 
+setTimeout(function(){var e=$("pg");if(e)e.parentNode.removeChild(e)},2300);
 // ------------------------------------------------ router
 if(q.get("ws")){startWS(q.get("ws"))}
 else if(q.get("vault")){startVault(q.get("vault"))}
@@ -171,7 +181,7 @@ else{
   var msgs={room:"A friend invited you to a race!",grp:"A friend invited you to their group!",party:"A friend invited you to a party race!"},m="A friend sent you a challenge!";
   for(var k in msgs)if(q.get(k))m=msgs[k];
   htm("<p>"+m+"</p>");
-  if(isAndroid)setTimeout(function(){location.href=intent},400);
+  if(isAndroid)setTimeout(function(){location.href=intent},2300);
   else{var n=document.createElement("p");n.textContent="Scalo is an Android game. Open this link on your Android phone.";app.appendChild(n)}
 }
 </script></body></html>
