@@ -29,14 +29,14 @@ input{width:100%;max-width:340px;padding:12px;font-size:18px;border-radius:12px;
 <div id="app"></div>
 <div id="cta">
 <a class="b s" id="open" href="#">Open in Scale Puzzle app</a>
-<a class="b s" href="https://play.google.com/store/apps/details?id=com.scalo.app">Get Scale Puzzle on Google Play</a>
+<a class="b s" href="https://play.google.com/store/apps/details?id=com.scalepuzzle.app">Get Scale Puzzle on Google Play</a>
 </div>
 </div>
 <script>
 var q=new URLSearchParams(location.search);
 var $=function(i){return document.getElementById(i)};
-var store="https://play.google.com/store/apps/details?id=com.scalo.app";
-var intent="intent://open"+(location.search||"")+"#Intent;scheme=scalo;package=com.scalo.app;S.browser_fallback_url="+encodeURIComponent(store)+";end";
+var store="https://play.google.com/store/apps/details?id=com.scalepuzzle.app";
+var intent="intent://open"+(location.search||"")+"#Intent;scheme=scalo;package=com.scalepuzzle.app;S.browser_fallback_url="+encodeURIComponent(store)+";end";
 var isAndroid=/Android/i.test(navigator.userAgent);
 var app=$("app");
 if(isAndroid)$("open").href=intent;else $("open").style.display="none";

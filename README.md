@@ -1,6 +1,6 @@
 # Scale Puzzle Privacy Policy
 
-App: Scale Puzzle (com.scalo.app). Developer: Scalo Games. Contact: harilearns05@gmail.com. Last updated: 25 November 2026.
+App: Scale Puzzle (com.scalepuzzle.app). Developer: Scalo Games. Contact: harilearns05@gmail.com. Last updated: 25 November 2026.
 
 ## What the app stores on your phone
 Progress (stars, streak, badges, collection, friends list names, settings, your display name). This stays on your device and is removed when you uninstall.
